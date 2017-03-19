@@ -119,7 +119,7 @@ var worldMapState = {
 
       winGame: function()
       {
-        game.state.start('credits');
+        game.state.start('creditState');
       },
 
       beginGame: function()
