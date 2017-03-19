@@ -13,16 +13,20 @@ var worldMapState = {
     door: "",
     enemyNumbers: 0,
 
+    instructions: "",
+
+    myText:"You got rid of all of the harrasers! Congratulations!",
+
     init: function(enemyCount = 5) {
         this.enemyNumbers = enemyCount;
     },
 
     create: function () {
 
+      console.log('Harrasers Left:' + this.enemyNumbers);
+
        game.world.setBounds(0, 0, 1024, 1024);
-       ground = game.add.tileSprite(0, 0, 1024, 1024, 'groundGrass');
-       door = game.add.sprite(640, 640, 'groundDoor');
-       door.scale.setTo(3,3);
+       this.ground = game.add.tileSprite(0, 0, 1024, 1024, 'groundGrass');
 
        this.player = game.add.sprite(96, 96, 'mainHero');
        this.player.anchor.set(0.5);
@@ -46,16 +50,25 @@ var worldMapState = {
        this.wall.create(496,496, 'wallBlock');
        this.wall.setAll('body.immovable', true);
 
+       this.door = game.add.physicsGroup();
+       this.door.create(560, 560, 'groundDoor');
+       this.door.setAll('body.immovable', true);
+       //this.door.scale.setTo(3,3);
+
     },
 
     update: function() {
+
+      this.instructions = game.add.text(64, 32, "Get rid of all the online trolls!");
+
+      game.time.events.add(Phaser.Timer.SECOND * 4, worldMapState.beginGame, this);
 
         game.physics.arcade.collide(this.player, this.wall);
         this.player.body.collideWorldBounds = true;
         this.player.body.velocity.x = 0;
         this.player.body.velocity.y = 0;
 
-        game.physics.arcade.collide(this.player, this.enemies, this.collisionCallback, this.processCallback, this);
+        game.physics.arcade.overlap(this.player, this.enemies, this.killEnemy);
         game.physics.arcade.collide(this.wall, this.enemies);
 
 
@@ -77,16 +90,41 @@ var worldMapState = {
             this.player.body.velocity.x = 240;
         }
 
+          game.physics.arcade.overlap(this.player, this.door, this.beatStage);
+
     },
 
-    processCallback: function(obj1, obj2)
+    killEnemy: function(obj1, obj2)
     {
         obj2.kill();
+        worldMapState.enemyNumbers -= 1;
+        console.log('Harrasers Left:' + worldMapState.enemyNumbers);
     },
 
-    collisionCallback: function(obj1, obj2)
+    beatStage: function(obj1, obj2)
     {
-      obj2.kill();
-    }
+      if (worldMapState.enemyNumbers == 0)
+      {
+        console.log('Yup');
+        var congrats = game.add.text((game.world.width * 0.3), (game.world.height * 0.5), "Congatulations. You got rid of\nall the harrasment trolls online!");
+
+        game.time.events.add(Phaser.Timer.SECOND * 4, worldMapState.winGame, this);
+
+      }
+      else
+      {
+        console.log('Nope');
+      }
+    },
+
+      winGame: function()
+      {
+        game.state.start('credits');
+      },
+
+      beginGame: function()
+      {
+        worldMapState.game.add.tween(worldMapState.instructions).to( { alpha: 0 }, 2000, Phaser.Easing.Linear.None, true);
+      }
 
 }

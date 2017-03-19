@@ -19,7 +19,7 @@ var battleState = {
             }
         }
         function tackle(){
-            game.add.tween(this.player).to( { x: this.enemy.x }, 2000, Phaser.Easing.Linear.None, true, 0, 1000, true);
+            game.add.tween(this.player).to( { x: this.enemy.x },2000, Phaser.Easing.Linear.None, true, 0, 1000, false, true);
         }
 
 
@@ -29,7 +29,7 @@ var battleState = {
         this.hud.circleButton.scale.x = 3;
         this.hud.circleButton.scale.y = 3;
         this.hud.circleButton.inputEnabled = true;
-        //this.hud.circleButton.events.onInputDown.add(leap, this);
+        this.hud.circleButton.events.onInputDown.add(tackle, this);
 
         this.hud.downButton = game.add.image( (game.world.width * 0.15), (game.world.height * 0.80), 'menuDownButton');
         this.hud.downButton.anchor.set(0.5);
@@ -56,8 +56,6 @@ var battleState = {
     create: function () {
         console.log("You are now in the battle zooooooonnneee!!!!");
         console.log(`The Enemy Count is ${this.enemyNumber}`);
-
-
 
         this.player = game.add.sprite(100, 100, 'mainHero');
         this.player.anchor.set(0.5);
