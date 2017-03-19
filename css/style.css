@@ -1,0 +1,21 @@
+.icon-block {
+  padding: 0 15px;
+}
+.icon-block .material-icons {
+	font-size: inherit;
+}
+
+/* — — — CUSTOM THEME — — — */
+
+h1 {
+  font-size: 0.85em;
+  color: #000;
+}
+
+.gradient-ybd {
+  background: rgb(255,228,134);
+  background: -moz-linear-gradient(-45deg, rgba(255,228,134,1) 0%, rgba(133,200,251,1) 100%);
+  background: -webkit-linear-gradient(-45deg, rgba(255,228,134,1) 0%,rgba(133,200,251,1) 100%);
+  background: linear-gradient(135deg, rgba(255,228,134,1) 0%,rgba(133,200,251,1) 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffe486', endColorstr='#85c8fb',GradientType=1 );
+}
