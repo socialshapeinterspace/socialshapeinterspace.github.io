@@ -8,6 +8,10 @@ var loadState = {
         In this case of loading, only text is placed...
         */
 
+        game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
+        game.scale.pageAlignHorizontally = true;
+        game.scale.pageAlignVertically = true;
+
         var loadingLabel = game.add.text(80, 150, 'loading...', {font: '30px Courier', fill: '#fff'});
 
         //Menu Items

@@ -1,5 +1,9 @@
 var menuState = {
 
+    transData: {
+        enemyCount: 3,
+    },
+
     create: function () {
 
         function centerAnchorOrigin(a) {
@@ -7,11 +11,15 @@ var menuState = {
         }
 
         function goToWorldMap(){
-          game.state.start('worldMap');
+          game.state.start('worldMap',1,0,this.transData);
         }
 
         function goToCredits(){
           game.state.start('credits');
+        }
+
+        function goToBattle(){
+          game.state.start('battleMode',1,0,this.transData);
         }
 
         var gameLogo;
@@ -46,14 +54,21 @@ var menuState = {
 
           centerAnchorOrigin(creditButton);
 
+        //button to go straight in battle (debugging testing only)
+        var bXpos = game.world.width * 0.75;
+        var bYpos = game.world.height * 0.75;
+        battleButton = game.add.image( bXpos, bYpos, 'enemyBattle1' );
+        battleButton.inputEnabled = true;
+        battleButton.events.onInputDown.add(goToBattle, this);
+
         //game.add.plugin(Phaser.Plugin.Inspector);
   },
-  enemyStart: 3, //this variable will be passed into the next state
+
   update: function (){
 
         if ( game.input.keyboard.isDown(Phaser.Keyboard.ENTER) ) {
 
-          game.state.start('worldMap');
+          game.state.start('worldMap',true,false,this.transData);
 
         } else if ( game.input.keyboard.isDown(Phaser.Keyboard.B) ) {
 
@@ -62,7 +77,7 @@ var menuState = {
 
         } else if ( game.input.keyboard.isDown(Phaser.Keyboard.M) ) {
 
-          game.state.start('worldMap');
+          game.state.start('worldMap',true,false,this.transData);
         }
   },
 

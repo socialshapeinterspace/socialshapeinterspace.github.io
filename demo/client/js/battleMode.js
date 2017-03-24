@@ -1,6 +1,7 @@
 var battleState = {
 
     player: 0,
+    playerTween: 0,
     enemy: 0,
     enemyNumber: 0,
     enemyGroup: [],
@@ -10,7 +11,7 @@ var battleState = {
 
         function leap(){
             if (this.player.body.onFloor() || this.player.body.touching.down){
-                this.player.body.velocity.y = -600;
+                this.player.body.velocity.y = -1200;
             }
         }
         function fall(){
@@ -19,7 +20,22 @@ var battleState = {
             }
         }
         function tackle(){
-            game.add.tween(this.player).to( { x: this.enemy.x },2000, Phaser.Easing.Linear.None, true, 0, 1000, false, true);
+
+            var tween = game.add.tween(this.player); //test with local variable
+            var properties = { x: this.enemy.x };
+            var moveSpeed = 500;
+            this.player.dashing = true;
+            tween.to( properties,moveSpeed, Phaser.Easing.Linear.None, true, 0, 0, false);
+            tween.onComplete.addOnce(returnToOrigin, this);
+        }
+
+        function returnToOrigin(){
+
+            var tween = game.add.tween(this.player); //test with local variable
+            var properties = { x: this.player.xMark };
+            var moveSpeed = 500;
+            this.player.dashing = true;
+            tween.to( properties,moveSpeed, Phaser.Easing.Linear.None, true, 0, 0, false);
         }
 
 
@@ -60,12 +76,17 @@ var battleState = {
         this.player = game.add.sprite(100, 100, 'mainHero');
         this.player.anchor.set(0.5);
         game.physics.arcade.enable(this.player);
-        this.player.body.gravity.y = 700;
+        this.player.body.gravity.y = 3000;
         this.player.body.collideWorldBounds = true;
         this.player.dashing = false;
+        //flag xy coordinates as positions to return to after action
+        this.player.xMark = this.player.x;
+        this.player.yMark = this.player.y;
 
         this.player.scale.x = 1.75;
         this.player.scale.y = 1.75;
+
+        this.playerTween = game.add.tween(this.player);
 
         var randy =  1 + Math.floor(Math.random() * 10);
         this.enemy = game.add.sprite(500,100,"enemyBattle1");

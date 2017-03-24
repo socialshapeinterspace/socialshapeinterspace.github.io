@@ -2,6 +2,7 @@
 
 var worldMapState = {
 
+    transData:{},
     player: "",
     enemies: "",
 
@@ -17,8 +18,8 @@ var worldMapState = {
 
     myText:"You got rid of all of the harrasers! Congratulations!",
 
-    init: function(enemyCount = 5) {
-        this.enemyNumbers = enemyCount;
+    init: function(transData) {
+        this.enemyNumbers = transData.enemyCount;
     },
 
     create: function () {
@@ -119,7 +120,7 @@ var worldMapState = {
 
       winGame: function()
       {
-        game.state.start('creditState');
+        game.state.start('credits');
       },
 
       beginGame: function()
