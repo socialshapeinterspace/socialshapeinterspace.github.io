@@ -70,7 +70,6 @@ var worldMapState = {
        this.enemyHandler();
 
        this.cursors = game.input.keyboard.createCursorKeys();
-
        this.wall = game.add.physicsGroup();
        this.wall.create(0,0, 'wallBlock');
        this.wall.create(960,0, 'wallBlock');
@@ -88,11 +87,15 @@ var worldMapState = {
 
     },
 
+    touchMovement: function(){
+        game.physics.arcade.moveToXY(this.player, game.input.x, game.input.y, 600);
+    },
+
     update: function() {
 
-      this.instructions = game.add.text(64, 32, "Get rid of all the online trolls!");
+        this.instructions = game.add.text(64, 32, "Get rid of all the online trolls!");
 
-      game.time.events.add(Phaser.Timer.SECOND * 4, worldMapState.beginGame, this);
+        game.time.events.add(Phaser.Timer.SECOND * 4, worldMapState.beginGame, this);
 
         game.physics.arcade.collide(this.player, this.wall);
         this.player.body.collideWorldBounds = true;
@@ -103,10 +106,14 @@ var worldMapState = {
         game.physics.arcade.collide(this.wall, this.enemies);
 
         //Experimental touch movement
+        /*
         if (game.input.mousePointer.isDown){
             game.physics.arcade.moveToXY(this.player, game.input.x, game.input.y, 600);
+        }*/
+        //game.input.onTap.add(this.touchMovement, this);
+        if (game.input.touch.onHold || game.input.mousePointer.isDown){
+          game.physics.arcade.moveToPointer(this.player, 100);
         }
-
         if (this.cursors.up.isDown)
         {
             this.player.body.velocity.y = -240;
