@@ -5,6 +5,8 @@ var worldMapState = {
     transData:{},
     player: "",
     enemies: "",
+    stageWidth:  1024,
+    stageHeight: 1024,
 
     wall: "",
     ground: "",
@@ -19,27 +21,53 @@ var worldMapState = {
     myText:"You got rid of all of the harrasers! Congratulations!",
 
     init: function(transData) {
-        this.enemyNumbers = transData.enemyCount;
+        var num = transData.enemyCount;
+        this.battleTransfer(num);
+
+        //pass explicit level information
+        this.transData.currentArea = "worldMap";
+    },
+
+    battleTransfer: function(count){
+        if (sessionStorage.getItem("battleReturn")){
+            //this
+        }
+        else{
+            //this is the first time we're visiting this stage presently
+            this.enemyNumbers = count;
+        }
+    },
+
+    enemyHandler: function(){
+        this.enemies = game.add.physicsGroup();
+        for (var i = 0; i < this.enemyNumbers; i++)
+        {
+          this.enemies.create(game.rnd.integerInRange(96, 928), game.rnd.integerInRange(96, 928), 'enemyBattle1');
+          game.add.tween(this.enemies).to( { y: (this.enemies.y + 50)}, 2000, Phaser.Easing.Quadratic.InOut, true, 0, 1000, true);
+        }
     },
 
     create: function () {
 
       console.log('Harrasers Left:' + this.enemyNumbers);
 
-       game.world.setBounds(0, 0, 1024, 1024);
+
+
+       game.world.setBounds(0, 0, this.stageWidth, this.stageHeight);
        this.ground = game.add.tileSprite(0, 0, 1024, 1024, 'groundGrass');
 
        this.player = game.add.sprite(96, 96, 'mainHero');
        this.player.anchor.set(0.5);
-       game.camera.follow(this.player);
        game.physics.arcade.enable(this.player);
 
-       this.enemies = game.add.physicsGroup();
-       for (var i = 0; i < this.enemyNumbers; i++)
-       {
-         this.enemies.create(game.rnd.integerInRange(96, 928), game.rnd.integerInRange(96, 928), 'enemyBattle1');
-         game.add.tween(this.enemies).to( { y: (this.enemies.y + 50)}, 2000, Phaser.Easing.Quadratic.InOut, true, 0, 1000, true);
-       }
+       //Control Game Camera
+       var camStyle = Phaser.Camera.FOLLOW_PLATFORMER;
+       game.camera.setSize(640,400);
+       game.camera.follow(this.player,camStyle);
+
+
+       //generate enemies
+       this.enemyHandler();
 
        this.cursors = game.input.keyboard.createCursorKeys();
 
@@ -55,6 +83,8 @@ var worldMapState = {
        this.door.create(560, 560, 'groundDoor');
        this.door.setAll('body.immovable', true);
        //this.door.scale.setTo(3,3);
+
+
 
     },
 
@@ -72,7 +102,10 @@ var worldMapState = {
         game.physics.arcade.overlap(this.player, this.enemies, this.killEnemy);
         game.physics.arcade.collide(this.wall, this.enemies);
 
-
+        //Experimental touch movement
+        if (game.input.mousePointer.isDown){
+            game.physics.arcade.moveToXY(this.player, game.input.x, game.input.y, 600);
+        }
 
         if (this.cursors.up.isDown)
         {
@@ -95,10 +128,16 @@ var worldMapState = {
 
     },
 
-    killEnemy: function(obj1, obj2)
+    //If this a method specifying an interaction between player and enemy then
+    //the paramters be should abstracted as so
+    killEnemy: function(player, enemy)
     {
-        obj2.kill();
+        //obj2.kill();
+        sessionStorage.setItem('enemyFight',enemy)
+        worldMapState.enemies.remove(enemy);
         worldMapState.enemyNumbers -= 1;
+        worldMapState.transData.enemyCount = worldMapState.enemyNumbers;
+        levelTransfer.goTo('battleMode',worldMapState.transData);
         console.log('Harrasers Left:' + worldMapState.enemyNumbers);
     },
 
@@ -120,7 +159,8 @@ var worldMapState = {
 
       winGame: function()
       {
-        game.state.start('credits');
+        levelTransfer.goTo('credits',this.transData); //use our module to switch states
+        //game.state.start('credits');
       },
 
       beginGame: function()

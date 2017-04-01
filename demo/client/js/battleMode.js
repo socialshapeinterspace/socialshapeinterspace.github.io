@@ -1,11 +1,21 @@
 var battleState = {
 
+    transData: {},
     player: 0,
     playerTween: 0,
     enemy: 0,
     enemyNumber: 0,
     enemyGroup: [],
     hud : {},
+
+    init: function(transData){
+        this.enemyNumber = transData.enemyCount;
+
+        //pass explicit level information
+        this.transData.stage = "battleMode";
+        this.transData.currentArea = transData.currentArea;
+    },
+
     hudSetup : function(){
         var btnVis = 0.3;
 
@@ -65,14 +75,10 @@ var battleState = {
         this.hud.upButton.events.onInputDown.add(leap, this);
     },
 
-    init: function(enemyCount){
-        this.enemyNumber = enemyCount;
-    },
-
     create: function () {
         console.log("You are now in the battle zooooooonnneee!!!!");
-        console.log(`The Enemy Count is ${this.enemyNumber}`);
-
+        //console.log(`The Enemy Count is ${this.enemyNumber}`);
+        game.world.setBounds(0, 0, 600, 400);
         this.player = game.add.sprite(100, 100, 'mainHero');
         this.player.anchor.set(0.5);
         game.physics.arcade.enable(this.player);
@@ -103,5 +109,16 @@ var battleState = {
     },
 
     update: function(){
+        //game.physics.arcade.collide(sprite1, sprite2, battleState.battleClash);
+        game.physics.arcade.overlap(this.player, this.enemy, battleState.battleClash);
+    },
+
+    battleClash: function(player, enemy){
+        enemy.kill();
+        //The area varible makes sure we return to whichever map we came from
+        battleState.transData.enemyCount = battleState.enemyNumber;
+        var area = battleState.transData.currentArea;
+        var data = battleState.transData;
+        levelTransfer.goTo(area,data);
     },
 };

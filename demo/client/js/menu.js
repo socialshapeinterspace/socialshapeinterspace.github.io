@@ -1,8 +1,6 @@
 var menuState = {
 
-    transData: {
-        enemyCount: 3,
-    },
+    transData: {},
 
     create: function () {
 
@@ -18,7 +16,7 @@ var menuState = {
           game.state.start('credits');
         }
 
-        function goToBattle(){
+        function goToBattleTest(){
           game.state.start('battleMode',1,0,this.transData);
         }
 
@@ -26,6 +24,9 @@ var menuState = {
         var menuPointer;
         var startButton;
         var creditButton;
+
+        //Feel free to change this
+        this.transData.enemyCount = 5;
 
         //game.add.plugin(Phaser.Plugin.Debug);
 
@@ -54,36 +55,40 @@ var menuState = {
 
           centerAnchorOrigin(creditButton);
 
-        //button to go straight in battle (debugging testing only)
-        var bXpos = game.world.width * 0.75;
-        var bYpos = game.world.height * 0.75;
-        battleButton = game.add.image( bXpos, bYpos, 'enemyBattle1' );
-        battleButton.inputEnabled = true;
-        battleButton.events.onInputDown.add(goToBattle, this);
-
+          /*
+          //****TESTING******
+          //button to go straight in battle (debugging testing only)
+          var bXpos = game.world.width * 0.75;
+          var bYpos = game.world.height * 0.75;
+          battleButton = game.add.image( bXpos, bYpos, 'enemyBattle1' );
+          battleButton.inputEnabled = true;
+          battleButton.events.onInputDown.add(goToBattleTest, this);
+          */
+          
         //game.add.plugin(Phaser.Plugin.Inspector);
   },
 
   update: function (){
 
-        if ( game.input.keyboard.isDown(Phaser.Keyboard.ENTER) ) {
+        //Advice: abstract verbose control flow for readability when necessary
+        //The update function may not be the best place to declare vars however
+        var enterKey = game.input.keyboard.isDown(Phaser.Keyboard.ENTER);
+        var mKey = game.input.keyboard.isDown(Phaser.Keyboard.M);
+        var bKey = game.input.keyboard.isDown(Phaser.Keyboard.B);
 
-          game.state.start('worldMap',true,false,this.transData);
-
-        } else if ( game.input.keyboard.isDown(Phaser.Keyboard.B) ) {
-
-          //arguments (level key, clear canvas?, clear resources?, ...)
-          game.state.start('battleMode',true,false,this.enemyStart);
-
-        } else if ( game.input.keyboard.isDown(Phaser.Keyboard.M) ) {
-
-          game.state.start('worldMap',true,false,this.transData);
+        if (enterKey || mKey) {
+          //notice the levelTransfer is being called with only 1 argument,
+          //this is the default parameter at work.
+          //this.levelTransfer('worldMap');
+          console.log(this.transData);
+          levelTransfer.goTo('worldMap',this.transData);
+        }
+        else if (bKey) {
+          //this.levelTransfer('battleMode');
+          levelTransfer.goTo('battleMode',this.transData);
         }
   },
 
-  start: function() {
-       game.state.start('worldMap');
-  }
-
-        //game.add.plugin(Phaser.Plugin.Inspector);
 };
+
+//game.add.plugin(Phaser.Plugin.Inspector);
