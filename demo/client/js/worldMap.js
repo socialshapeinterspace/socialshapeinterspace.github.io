@@ -5,8 +5,6 @@ var worldMapState = {
     transData:{},
     player: "",
     enemies: "",
-    stageWidth:  1024,
-    stageHeight: 1024,
 
     wall: "",
     ground: "",
@@ -21,55 +19,30 @@ var worldMapState = {
     myText:"You got rid of all of the harrasers! Congratulations!",
 
     init: function(transData) {
-        var num = transData.enemyCount;
-        this.battleTransfer(num);
-
-        //pass explicit level information
-        this.transData.currentArea = "worldMap";
-    },
-
-    battleTransfer: function(count){
-        if (sessionStorage.getItem("battleReturn")){
-            //this
-        }
-        else{
-            //this is the first time we're visiting this stage presently
-            this.enemyNumbers = count;
-        }
-    },
-
-    enemyHandler: function(){
-        this.enemies = game.add.physicsGroup();
-        for (var i = 0; i < this.enemyNumbers; i++)
-        {
-          this.enemies.create(game.rnd.integerInRange(96, 928), game.rnd.integerInRange(96, 928), 'enemyBattle1');
-          game.add.tween(this.enemies).to( { y: (this.enemies.y + 50)}, 2000, Phaser.Easing.Quadratic.InOut, true, 0, 1000, true);
-        }
+        this.enemyNumbers = transData.enemyCount;
     },
 
     create: function () {
 
       console.log('Harrasers Left:' + this.enemyNumbers);
 
-
-
-       game.world.setBounds(0, 0, this.stageWidth, this.stageHeight);
+       game.world.setBounds(0, 0, 1024, 1024);
        this.ground = game.add.tileSprite(0, 0, 1024, 1024, 'groundGrass');
 
        this.player = game.add.sprite(96, 96, 'mainHero');
        this.player.anchor.set(0.5);
+       game.camera.follow(this.player);
        game.physics.arcade.enable(this.player);
 
-       //Control Game Camera
-       var camStyle = Phaser.Camera.FOLLOW_PLATFORMER;
-       game.camera.setSize(640,400);
-       game.camera.follow(this.player,camStyle);
-
-
-       //generate enemies
-       this.enemyHandler();
+       this.enemies = game.add.physicsGroup();
+       for (var i = 0; i < this.enemyNumbers; i++)
+       {
+         this.enemies.create(game.rnd.integerInRange(96, 928), game.rnd.integerInRange(96, 928), 'enemyBattle1');
+         game.add.tween(this.enemies).to( { y: (this.enemies.y + 50)}, 2000, Phaser.Easing.Quadratic.InOut, true, 0, 1000, true);
+       }
 
        this.cursors = game.input.keyboard.createCursorKeys();
+
        this.wall = game.add.physicsGroup();
        this.wall.create(0,0, 'wallBlock');
        this.wall.create(960,0, 'wallBlock');
@@ -83,19 +56,13 @@ var worldMapState = {
        this.door.setAll('body.immovable', true);
        //this.door.scale.setTo(3,3);
 
-
-
-    },
-
-    touchMovement: function(){
-        game.physics.arcade.moveToXY(this.player, game.input.x, game.input.y, 600);
     },
 
     update: function() {
 
-        this.instructions = game.add.text(64, 32, "Get rid of all the online trolls!");
+      this.instructions = game.add.text(64, 32, "Get rid of all the online trolls!");
 
-        game.time.events.add(Phaser.Timer.SECOND * 4, worldMapState.beginGame, this);
+      game.time.events.add(Phaser.Timer.SECOND * 4, worldMapState.beginGame, this);
 
         game.physics.arcade.collide(this.player, this.wall);
         this.player.body.collideWorldBounds = true;
@@ -105,15 +72,8 @@ var worldMapState = {
         game.physics.arcade.overlap(this.player, this.enemies, this.killEnemy);
         game.physics.arcade.collide(this.wall, this.enemies);
 
-        //Experimental touch movement
-        /*
-        if (game.input.mousePointer.isDown){
-            game.physics.arcade.moveToXY(this.player, game.input.x, game.input.y, 600);
-        }*/
-        //game.input.onTap.add(this.touchMovement, this);
-        if (game.input.touch.onHold || game.input.mousePointer.isDown){
-          game.physics.arcade.moveToPointer(this.player, 100);
-        }
+
+
         if (this.cursors.up.isDown)
         {
             this.player.body.velocity.y = -240;
@@ -135,16 +95,10 @@ var worldMapState = {
 
     },
 
-    //If this a method specifying an interaction between player and enemy then
-    //the paramters be should abstracted as so
-    killEnemy: function(player, enemy)
+    killEnemy: function(obj1, obj2)
     {
-        //obj2.kill();
-        sessionStorage.setItem('enemyFight',enemy)
-        worldMapState.enemies.remove(enemy);
+        obj2.kill();
         worldMapState.enemyNumbers -= 1;
-        worldMapState.transData.enemyCount = worldMapState.enemyNumbers;
-        levelTransfer.goTo('battleMode',worldMapState.transData);
         console.log('Harrasers Left:' + worldMapState.enemyNumbers);
     },
 
@@ -166,8 +120,7 @@ var worldMapState = {
 
       winGame: function()
       {
-        levelTransfer.goTo('credits',this.transData); //use our module to switch states
-        //game.state.start('credits');
+        game.state.start('level1');
       },
 
       beginGame: function()

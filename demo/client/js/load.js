@@ -29,6 +29,13 @@ var loadState = {
         game.load.image('wallBlock','assets/img/characters/prototypeWall.png');
         game.load.image('mainHero', 'assets/img/characters/prototypeHero.png');
 
+        game.load.tilemap('level1', 'assets/tileMaps/level1.json', null, Phaser.Tilemap.TILED_JSON);
+        game.load.image('grass', 'assets/tileMaps/grass.png');
+        game.load.image('trees', 'assets/tileMaps/trees.png');
+
+        // Sprite Sheets
+        game.load.spritesheet('treeSheet', 'assets/img/spriteSheets/treeSheet.png', 64, 64);
+
         //Load your sounds, efx, music...
         //Example: game.load.audio('rockas', 'assets/snd/rockas.wav');
 
